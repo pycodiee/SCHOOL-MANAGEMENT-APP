@@ -130,37 +130,26 @@ npm run dev:backend     # Backend on http://localhost:5000
 - **CORS**: Cross-origin resource sharing
 - **Dotenv**: Environment variable management
 
-## 🔧 Configuration
+### Images 
+![WhatsApp Image 2025-08-31 at 14 15 17_6846cc6f](https://github.com/user-attachments/assets/1c4d558a-0043-4edb-a768-35efbaf613e3)
+![WhatsApp Image 2025-08-31 at 14 14 49_dee5c105](https://github.com/user-attachments/assets/17c730e7-fc7a-48ab-ae2f-a50eed096100)
+![WhatsApp Image 2025-08-31 at 14 16 13_df1990bd](https://github.com/user-attachments/assets/9dc7360e-5cc3-4ba6-a6d2-3c8ed7e6616a) ![WhatsApp Image 2025-08-31 at 14 18 07_c9d3396f](https://github.com/user-attachments/assets/6a3f52d6-06e4-43b8-9397-ec0bef4531d3) ![WhatsApp Image 2025-08-31 at 14 35 53_e1485d6b](https://github.com/user-attachments/assets/d5fc1ed9-01b2-4e08-882c-2c10206cc6bc)
+![WhatsApp Image 2025-08-31 at 14 19 35_d1f7b831](https://github.com/user-attachments/assets/30a976d8-7a6c-4e74-b730-04f10085e14c)
+![WhatsApp Image 2025-08-31 at 14 20 32_13bf0b01](https://github.com/user-attachments/assets/3e9b2e95-ea22-4211-9629-411609709e21)
+![WhatsApp Image 2025-08-31 at 14 21 53_5b06fd5b](https://github.com/user-attachments/assets/ecb856dc-993d-4b32-b3cd-e842e1418c43)
 
-### Environment Variables
 
-Create `backend/config.env`:
-```env
-DB_HOST=localhost
-DB_USER=your_username
-DB_PASSWORD=your_password
-DB_NAME=school_management
-DB_PORT=3306
-PORT=5000
-```
+
+
+
+
+
+
+
 
 ### Database Schema
 
-The application automatically creates the `schools` table with the following structure:
-
-```sql
-CREATE TABLE schools (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name TEXT NOT NULL,
-  address TEXT NOT NULL,
-  city TEXT NOT NULL,
-  state TEXT NOT NULL,
-  contact VARCHAR(15) NOT NULL,
-  image TEXT,
-  email_id VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+The application automatically creates the `schools` table.
 
 ## 📱 Responsive Design
 
@@ -227,3 +216,4 @@ If you encounter any issues or have questions:
 ---
 
 **Built with ❤️ using Next.js, Node.js, and MySQL**
+

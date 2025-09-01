@@ -9,13 +9,23 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+const allowedOrigins = [
+  "http://localhost:3000", // for local dev
+  "https://school-management-app-rouge-nu.vercel.app" // your deployed Vercel frontend
+];
+
 app.use(cors({
-  origin: [
-    "http://localhost:3000", // for dev
-    "https://school-management-app-rouge-nu.vercel.app/" // replace with your actual deployed frontend URL
-  ],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -215,6 +225,7 @@ app.listen(PORT, () => {
   console.log(`Upload directory: ${uploadsDir}`);
   console.log(`School images directory: ${schoolImagesDir}`);
 });
+
 
 
 

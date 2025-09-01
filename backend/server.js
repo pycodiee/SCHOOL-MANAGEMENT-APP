@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     "http://localhost:3000", // for dev
-    "https://school-management-app-jjjb.vercel.app/" // replace with your actual deployed frontend URL
+    "https://school-management-app-rouge-nu.vercel.app/" // replace with your actual deployed frontend URL
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
 }));
@@ -215,6 +215,7 @@ app.listen(PORT, () => {
   console.log(`Upload directory: ${uploadsDir}`);
   console.log(`School images directory: ${schoolImagesDir}`);
 });
+
 
 
 

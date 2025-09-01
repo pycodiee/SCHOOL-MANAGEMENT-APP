@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Search, MapPin, Eye, Plus, GraduationCap, Filter, Trash2, X, Phone, Mail, Calendar } from 'lucide-react'
+import { Search, MapPin, Eye, GraduationCap, Trash2, X, Phone, Mail, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -17,6 +17,9 @@ export default function ShowSchools() {
   const [selectedSchool, setSelectedSchool] = useState(null)
   const [showModal, setShowModal] = useState(false)
 
+  // ✅ Backend URL (Render in prod, localhost in dev)
+  const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "")
+
   useEffect(() => {
     fetchSchools()
   }, [])
@@ -28,15 +31,13 @@ export default function ShowSchools() {
   const fetchSchools = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/schools`)
+      const response = await axios.get(`${apiUrl}/api/schools`)
       setSchools(response.data)
-      
-      // Extract unique cities and states for filters
+
       const uniqueCities = [...new Set(response.data.map(school => school.city))]
       const uniqueStates = [...new Set(response.data.map(school => school.state))]
       setCities(uniqueCities)
       setStates(uniqueStates)
-      
     } catch (error) {
       console.error('Error fetching schools:', error)
       toast.error('Failed to fetch schools')
@@ -76,9 +77,9 @@ export default function ShowSchools() {
   const deleteSchool = async (schoolId, schoolName) => {
     if (window.confirm(`Are you sure you want to delete "${schoolName}"? This action cannot be undone.`)) {
       try {
-        await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/schools/${schoolId}`)
+        await axios.delete(`${apiUrl}/api/schools/${schoolId}`)
         toast.success(`"${schoolName}" deleted successfully`)
-        fetchSchools() // Refresh the list
+        fetchSchools()
       } catch (error) {
         console.error('Error deleting school:', error)
         toast.error('Failed to delete school')
@@ -97,8 +98,9 @@ export default function ShowSchools() {
   }
 
   const getImageUrl = (imageName) => {
-    if (!imageName) return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNjBDMTEwLjQ1NyA2MCAxMTkgNjguNTQzIDExOSA3OEMxMTkgODcuNDU3IDExMC40NTcgOTYgMTAwIDk2Qzg5LjU0MyA5NiA4MSA4Ny40NTcgODEgNzhDOC4xIDY4LjU0MyA4MSA2MCAxMDAgNjBaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0xMDAgMTE2QzExMC40NTcgMTE2IDExOSAxMDcuNDU3IDExOSA5OEMxMTkgODguNTQzIDExMC40NTcgODAgMTAwIDgwQzg5LjU0MyA4MCA4MSA4OC41NDMgODEgOThDOC4xIDEwNy40NTcgODEgMTE2IDEwMCAxMTZaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo='
-    return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/schoolImages/${imageName}`
+    if (!imageName)
+      return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNjBDMTEwLjQ1NyA2MCAxMTkgNjguNTQzIDExOSA3OEMxMTkgODcuNDU3IDExMC40NTcgOTYgMTAwIDk2Qzg5LjU0MyA5NiA4MSA4Ny40NTcgODEgNzhDOC4xIDY4LjU0MyA4MSA2MCAxMDAgNjBaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0xMDAgMTE2QzExMC40NTcgMTE2IDExOSAxMDcuNDU3IDExOSA5OEMxMTkgODguNTQzIDExMC40NTcgODAgMTAwIDgwQzg5LjU0MyA4MCA4MSA4OC41NDMgODEgOThDOC4xIDEwNy40NTcgODEgMTE2IDEwMCAxMTZaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo='
+    return `${apiUrl}/schoolImages/${imageName}`
   }
 
   if (loading) {
@@ -245,15 +247,15 @@ export default function ShowSchools() {
                 >
                   {/* Image */}
                   <div className="relative h-48 overflow-hidden">
-                                         <img
-                       src={getImageUrl(school.image)}
-                       alt={school.name}
-                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                       onError={(e) => {
-                         // Show a placeholder when image fails to load
-                         e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNjBDMTEwLjQ1NyA2MCAxMTkgNjguNTQzIDExOSA3OEMxMTkgODcuNDU3IDExMC40NTcgOTYgMTAwIDk2Qzg5LjU0MyA5NiA4MSA4Ny40NTcgODEgNzhDOC4xIDY4LjU0MyA4MSA2MCAxMDAgNjBaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0xMDAgMTE2QzExMC40NTcgMTE2IDExOSAxMDcuNDU3IDExOSA5OEMxMTkgODguNTQzIDExMC40NTcgODAgMTAwIDgwQzg5LjU0MyA4MCA4MSA4OC41NDMgODEgOThDOC4xIDEwNy40NTcgODEgMTE2IDEwMCAxMTZaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo='
-                       }}
-                     />
+                    <img
+                      src={getImageUrl(school.image)}
+                      alt={school.name}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      onError={(e) => {
+                        e.target.src =
+                          'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNjBDMTEwLjQ1NyA2MCAxMTkgNjguNTQzIDExOSA3OEMxMTkgODcuNDU3IDExMC40NTcgOTYgMTAwIDk2Qzg5LjU0MyA5NiA4MSA4Ny40NTcgODEgNzhDOC4xIDY4LjU0MyA4MSA2MCAxMDAgNjBaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0xMDAgMTE2QzExMC40NTcgMTE2IDExOSAxMDcuNDU3IDExOSA5OEMxMTkgODguNTQzIDExMC40NTcgODAgMTAwIDgwQzg5LjU0MyA4MCA4MSA4OC41NDMgODEgOThDOC4xIDEwNy40NTcgODEgMTE2IDEwMCAxMTZaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo='
+                      }}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                   </div>
 
@@ -262,7 +264,7 @@ export default function ShowSchools() {
                     <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">
                       {school.name}
                     </h3>
-                    
+
                     <div className="space-y-2 mb-4">
                       <div className="flex items-start gap-2">
                         <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -274,18 +276,18 @@ export default function ShowSchools() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-2">
-                                             <motion.button
-                         className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
-                         whileHover={{ scale: 1.02 }}
-                         whileTap={{ scale: 0.98 }}
-                         onClick={() => openSchoolDetails(school)}
-                       >
+                      <motion.button
+                        className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => openSchoolDetails(school)}
+                      >
                         <div className="flex items-center justify-center gap-2">
                           <Eye className="w-4 h-4" />
                           View Details
                         </div>
                       </motion.button>
-                      
+
                       <motion.button
                         className="px-4 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all"
                         whileHover={{ scale: 1.02 }}
@@ -301,140 +303,139 @@ export default function ShowSchools() {
               ))}
             </AnimatePresence>
           </div>
-                 )}
-       </div>
+        )}
+      </div>
 
-       {/* School Details Modal */}
-       <AnimatePresence>
-         {showModal && selectedSchool && (
-           <motion.div
-             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }}
-             onClick={closeSchoolDetails}
-           >
-             <motion.div
-               className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-               initial={{ scale: 0.9, opacity: 0 }}
-               animate={{ scale: 1, opacity: 1 }}
-               exit={{ scale: 0.9, opacity: 0 }}
-               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-               onClick={(e) => e.stopPropagation()}
-             >
-               {/* Header */}
-               <div className="relative">
-                 {/* Image */}
-                 <div className="relative h-64 overflow-hidden rounded-t-2xl">
-                   <img
-                     src={getImageUrl(selectedSchool.image)}
-                     alt={selectedSchool.name}
-                     className="w-full h-full object-cover"
-                     onError={(e) => {
-                       e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNjBDMTEwLjQ1NyA2MCAxMTkgNjguNTQzIDExOSA3OEMxMTkgODcuNDU3IDExMC40NTcgOTYgMTAwIDk2Qzg5LjU0MyA5NiA4MSA4Ny40NTcgODEgNzhDOC4xIDY4LjU0MyA4MSA2MCAxMDAgNjBaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0xMDAgMTE2QzExMC40NTcgMTE2IDExOSAxMDcuNDU3IDExOSA5OEMxMTkgODguNTQzIDExMC40NTcgODAgMTAwIDgwQzg5LjU0MyA4MCA4MSA4OC41NDMgODEgOThDOC4xIDEwNy40NTcgODEgMTE2IDEwMCAxMTZaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo='
-                     }}
-                   />
-                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                   
-                   {/* Close Button */}
-                   <motion.button
-                     className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition-all"
-                     onClick={closeSchoolDetails}
-                     whileHover={{ scale: 1.1 }}
-                     whileTap={{ scale: 0.9 }}
-                   >
-                     <X className="w-5 h-5" />
-                   </motion.button>
-                 </div>
-               </div>
+      {/* School Details Modal */}
+      <AnimatePresence>
+        {showModal && selectedSchool && (
+          <motion.div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeSchoolDetails}
+          >
+            <motion.div
+              className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="relative">
+                <div className="relative h-64 overflow-hidden rounded-t-2xl">
+                  <img
+                    src={getImageUrl(selectedSchool.image)}
+                    alt={selectedSchool.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src =
+                        'data:image/svg+xml;base64,PHN2ZyB3aWR0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNjBDMTEwLjQ1NyA2MCAxMTkgNjguNTQzIDExOSA3OEMxMTkgODcuNDU3IDExMC40NTcgOTYgMTAwIDk2Qzg5LjU0MyA5NiA4MSA4Ny40NTcgODEgNzhDOC4xIDY4LjU0MyA4MSA2MCAxMDAgNjBaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0xMDAgMTE2QzExMC40NTcgMTE2IDExOSAxMDcuNDU3IDExOSA5OEMxMTkgODguNTQzIDExMC40NTcgODAgMTAwIDgwQzg5LjU0MyA4MCA4MSA4OC41NDMgODEgOThDOC4xIDEwNy40NTcgODEgMTE2IDEwMCAxMTZaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo='
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
 
-               {/* Content */}
-               <div className="p-6">
-                 <h2 className="text-3xl font-bold text-gray-800 mb-4">{selectedSchool.name}</h2>
-                 
-                 <div className="space-y-4">
-                   {/* Address */}
-                   <div className="flex items-start gap-3">
-                     <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                       <MapPin className="w-5 h-5 text-blue-600" />
-                     </div>
-                     <div>
-                       <h3 className="font-semibold text-gray-800 mb-1">Address</h3>
-                       <p className="text-gray-600">{selectedSchool.address}, {selectedSchool.city}, {selectedSchool.state}</p>
-                     </div>
-                   </div>
+                  <motion.button
+                    className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition-all"
+                    onClick={closeSchoolDetails}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <X className="w-5 h-5" />
+                  </motion.button>
+                </div>
+              </div>
 
-                   {/* Contact */}
-                   <div className="flex items-start gap-3">
-                     <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                       <Phone className="w-5 h-5 text-green-600" />
-                     </div>
-                     <div>
-                       <h3 className="font-semibold text-gray-800 mb-1">Contact</h3>
-                       <p className="text-gray-600">{selectedSchool.contact}</p>
-                     </div>
-                   </div>
+              {/* Content */}
+              <div className="p-6">
+                <h2 className="text-3xl font-bold text-gray-800 mb-4">{selectedSchool.name}</h2>
 
-                   {/* Email */}
-                   <div className="flex items-start gap-3">
-                     <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                       <Mail className="w-5 h-5 text-purple-600" />
-                     </div>
-                     <div>
-                       <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
-                       <p className="text-gray-600">{selectedSchool.email_id}</p>
-                     </div>
-                   </div>
+                <div className="space-y-4">
+                  {/* Address */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800 mb-1">Address</h3>
+                      <p className="text-gray-600">
+                        {selectedSchool.address}, {selectedSchool.city}, {selectedSchool.state}
+                      </p>
+                    </div>
+                  </div>
 
-                   {/* Created Date */}
-                   <div className="flex items-start gap-3">
-                     <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                       <Calendar className="w-5 h-5 text-orange-600" />
-                     </div>
-                     <div>
-                       <h3 className="font-semibold text-gray-800 mb-1">Added On</h3>
-                       <p className="text-gray-600">
-                         {new Date(selectedSchool.created_at).toLocaleDateString('en-US', {
-                           year: 'numeric',
-                           month: 'long',
-                           day: 'numeric'
-                         })}
-                       </p>
-                     </div>
-                   </div>
-                 </div>
+                  {/* Contact */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800 mb-1">Contact</h3>
+                      <p className="text-gray-600">{selectedSchool.contact}</p>
+                    </div>
+                  </div>
 
-                 {/* Action Buttons */}
-                 <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">
-                   <motion.button
-                     className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
-                     whileHover={{ scale: 1.02 }}
-                     whileTap={{ scale: 0.98 }}
-                     onClick={() => {
-                       // You can add edit functionality here
-                       toast.success(`Edit functionality coming soon for ${selectedSchool.name}`)
-                     }}
-                   >
-                     Edit School
-                   </motion.button>
-                   
-                   <motion.button
-                     className="px-6 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 transition-all"
-                     whileHover={{ scale: 1.02 }}
-                     whileTap={{ scale: 0.98 }}
-                     onClick={() => {
-                       closeSchoolDetails()
-                       deleteSchool(selectedSchool.id, selectedSchool.name)
-                     }}
-                   >
-                     Delete School
-                   </motion.button>
-                 </div>
-               </div>
-             </motion.div>
-           </motion.div>
-         )}
-       </AnimatePresence>
-     </div>
-   )
- }
+                  {/* Email */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
+                      <p className="text-gray-600">{selectedSchool.email_id}</p>
+                    </div>
+                  </div>
+
+                  {/* Created Date */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Calendar className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800 mb-1">Added On</h3>
+                      <p className="text-gray-600">
+                        {new Date(selectedSchool.created_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">
+                  <motion.button
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      toast.success(`Edit functionality coming soon for ${selectedSchool.name}`)
+                    }}
+                  >
+                    Edit School
+                  </motion.button>
+
+                  <motion.button
+                    className="px-6 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      closeSchoolDetails()
+                      deleteSchool(selectedSchool.id, selectedSchool.name)
+                    }}
+                  >
+                    Delete School
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}

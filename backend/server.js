@@ -9,7 +9,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:3000", // for dev
+    "https://school-management-app-jjjb.vercel.app/" // replace with your actual deployed frontend URL
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -209,6 +215,7 @@ app.listen(PORT, () => {
   console.log(`Upload directory: ${uploadsDir}`);
   console.log(`School images directory: ${schoolImagesDir}`);
 });
+
 
 
 

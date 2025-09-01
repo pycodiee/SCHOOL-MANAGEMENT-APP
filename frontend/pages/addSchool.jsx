@@ -21,6 +21,9 @@ export default function AddSchool() {
     watch
   } = useForm()
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+console.log("API URL being used:", apiUrl);
+
   const email = watch('email_id')
 
   const validateEmail = (email) => {
@@ -318,3 +321,4 @@ export default function AddSchool() {
     </div>
   )
 }
+

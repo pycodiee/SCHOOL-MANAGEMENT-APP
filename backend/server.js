@@ -59,7 +59,7 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: true
   },
   connectTimeout: 60000,
   acquireTimeout: 60000,
@@ -209,4 +209,5 @@ app.listen(PORT, () => {
   console.log(`Upload directory: ${uploadsDir}`);
   console.log(`School images directory: ${schoolImagesDir}`);
 });
+
 

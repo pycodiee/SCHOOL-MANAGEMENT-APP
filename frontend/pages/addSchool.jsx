@@ -73,7 +73,7 @@ export default function AddSchool() {
       formData.append('email_id', data.email_id)
       formData.append('image', selectedImage)
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "");;
 
     const response = await axios.post(`${apiUrl}/api/schools`, formData, {
       headers: {
@@ -319,5 +319,6 @@ export default function AddSchool() {
     </div>
   )
 }
+
 
 

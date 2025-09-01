@@ -21,9 +21,6 @@ export default function AddSchool() {
     watch
   } = useForm()
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-console.log("API URL being used:", apiUrl);
-
   const email = watch('email_id')
 
   const validateEmail = (email) => {
@@ -76,12 +73,13 @@ console.log("API URL being used:", apiUrl);
       formData.append('email_id', data.email_id)
       formData.append('image', selectedImage)
 
-      const response = await axios.post('http://localhost:5000/api/schools', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
+    const response = await axios.post(`${apiUrl}/api/schools`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
       toast.success('School added successfully!')
       reset()
       setSelectedImage(null)
@@ -321,4 +319,5 @@ console.log("API URL being used:", apiUrl);
     </div>
   )
 }
+
 
